@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SPS Basic IO</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+</head>
+<body>
+  <div class="container">
+      <h1>SPS Basic IO</h1>
+      <div>
+              <input class="bt_sw" id="0.0" name=0 type="button" value="0"
+                       onclick="block1_p(this)"</input>
+              <input class="bt_sw" id="0.1" name=1 type="button" value="0"
+                       onclick="block1_p(this)"</input>
+              <input class="bt_sw" id="0.2" name=2 type="button" value="0"
+                       onclick="block1_p(this)"</input>
+              <input class="bt_sw" id="0.3" name=3 type="button" value="0"
+                       onclick="block1_p(this)"</input>
+              <input class="bt_sw" id="0.4" name=4 type="button" value="0"
+                       onclick="block1_p(this)"</input>
+              <input class="bt_sw" id="0.5" name=5 type="button" value="0"
+                       onclick="block1_p(this)"</input>
+              <input class="bt_sw" id="0.6" name=6 type="button" value="0"
+                       onclick="block1_p(this)"</input>
+              <input class="bt_sw" id="0.7" name=7 type="button" value="0"
+                       onclick="block1_p(this)"</input>
+                </div>
+                <div id="spacer1"></div>
+                <div>
+                    <div id="i0.0" class="disp">0</div> 
+                    <div id="i0.1" class="disp">0</div>
+                    <div id="i0.2" class="disp">0</div>
+                    <div id="i0.3" class="disp">0</div>
+                    <div id="i0.4" class="disp">0</div>
+                    <div id="i0.5" class="disp">0</div>
+                    <div id="i0.6" class="disp">0</div>
+                    <div id="i0.7" class="disp">0</div>
+                        
+                    </div>
+                    <div id="spacer2"></div>
+                <div class="box">
+                    <p>I 1</p>
+                    <div id="i1" class="bdisp">0</div>
+                    </div>
+                    <div id="spacer3"></div>
+                <div class="box">
+                    <p>O 1</p>
+                    <input id="byte_in" type="text" value="0" size="30" maxlength="30"></input>
+                    <input id="bt_up" type="button" value="Update" 
+                    onclick="block_byte('byte_in')"</input>
+                </div>
+  </div>
+  <script>
+    var ws = new WebSocket('ws://localhost:8888/ws');
+    var $message = "1";
+    ws.onopen = function(){
+      console.log('Connection with Websock');
+    };
+    ws.onmessage = function(ev){
+        var data = ev.data;
+        console.log(data);
+        data = data.split(" ")
+        if (data[0] == 'O'){
+            if (data[1] == '1'){
+                document.getElementById("byte_in").value=data[2];
+            }
+            else{
+                var j = parseInt(data[2]);
+                var tmp = "";
+                for(var i = 128; i >= 1; i /= 2)
+                    tmp += j&i?'1':'0';
+                for(var i=0; i < 8; i++){
+                    document.getElementById(data[1]+'.'+i).innerHTML = tmp[7-i];
+                }
+            }
+
+        }
+        else{
+            if(data[1] == '1'){
+                document.getElementById("i1").innerHTML = data[2];
+            }
+            else{
+                var j = parseInt(data[2]);
+                var tmp = "";
+                for(var i = 128; i >= 1; i /= 2)
+                    tmp += j&i?'1':'0';
+                for(var i=0; i < 8; i++){
+                    document.getElementById('i' + data[1]+'.'+i).innerHTML = tmp[7-i];
+                }
+            }
+        }
+    };
+    ws.onclose = function(ev){
+        console.log('Connection Close')
+    };
+    ws.onerror = function(ev){
+      console.log('Error ' + ev.data)
+    };
+    function block1_p(obj){
+        if(obj.value == "0"){
+            obj.value = "1";
+        }
+        else{
+            obj.value = "0";
+        }
+        block_p = "b " + "0" + "." + obj.name + " " + obj.value;
+        ws.send(block_p);
+    };
+    function block_byte(obj){
+        block_p = "B " + "1" + " " + document.getElementById(obj).value;
+        ws.send(block_p);
+    };
+  </script>
+</body>
+</html>

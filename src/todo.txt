@@ -1,0 +1,14 @@
+Web:
+commandline 
+
+
+Runtime:
+Aufrufe prüfen
+Commanline?
+Projekt erstellen
+
+Mehr Tests / Test suite
+IOs nicht den speicher nicht direkt ändern
+
+parser tag methode zähler prüfen
+
